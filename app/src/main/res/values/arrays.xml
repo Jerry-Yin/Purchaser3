@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string-array name="date">
+        <item>西红柿</item>
+        <item>白菜</item>
+        <item>黄瓜</item>
+        <item>牛奶</item>
+        <item>番茄</item>
+        <item>土豆</item>
+        <item>面包</item>
+        <item>橙子</item>
+        <item>苹果</item>
+        <item>梨</item>
+        <item>椰子</item>
+        <item>草莓</item>
+        <item>番石榴</item>
+        <item>李子</item>
+        <item>猪肉</item>
+        <item>牛肉</item>
+        <item>羊肉</item>
+        <item>油桃</item>
+        <item>狮子</item>
+        <item>花椰菜</item>
+        <item>高雷</item>
+        <item>阮今天</item>
+        <item>龚琳娜</item>
+        <item>苏醒</item>
+        <item>苏永康</item>
+        <item>陶喆</item>
+        <item>沙宝亮</item>
+        <item>宋冬野</item>
+        <item>宋伟</item>
+        <item>袁成杰</item>
+        <item>戚薇</item>
+        <item>齐大友</item>
+        <item>齐天大圣</item>
+        <item>品冠</item>
+        <item>吴克群</item>
+        <item>BOBO</item>
+        <item>Jobs</item>
+        <item>动力火车</item>
+        <item>伍佰</item>
+        <item>#蔡依林</item>
+        <item>$797835344$</item>
+        <item>Jack</item>
+        <item>~夏先生</item>
+    </string-array>
+
+</resources>

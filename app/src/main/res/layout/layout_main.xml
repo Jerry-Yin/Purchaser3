@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#03A9F4">
+
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            android:text="@string/log_out"
+            android:layout_gravity="center"
+            android:textColor="#ffffff"
+            android:background="@null"
+            />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/app_name"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:textColor="#ffffff"/>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="30dp"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pay_sum"
+                    android:gravity="center"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="￥"
+                    android:textSize="15sp"
+                    android:layout_marginLeft="15dp"
+                    android:textColor="#ffffff"/>
+                <TextView
+                    android:id="@+id/tv_pay_sum"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="@string/pay_sum_zero"
+                    android:gravity="left"
+                    android:textSize="15sp"
+                    android:textColor="#ffffff"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            android:text="@string/send_msg"
+            android:layout_gravity="center"
+            android:textColor="#ffffff"
+            android:background="@null"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_marginRight="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:paddingLeft="2dp"
+            android:layout_height="match_parent"
+            android:text="@string/num"
+            android:gravity="center|center_vertical"
+            android:textSize="10sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/prduct_name"
+            android:gravity="center"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/price_line"
+            android:gravity="center"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/pur_num"
+            android:gravity="center"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/money_line"
+            android:gravity="center"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff">
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginRight="8dp">
+            </ListView>
+
+            <TextView
+                android:id="@+id/tv_dialog"
+                android:layout_width="80.0dip"
+                android:layout_height="80.0dip"
+                android:layout_gravity="center"
+                android:background="@drawable/tv_dialog_bg"
+                android:gravity="center"
+                android:textColor="#ffffffff"
+                android:textSize="30.0dip"
+                android:visibility="invisible"/>
+
+            <me.jiudeng.purchase.view.SideBar
+                android:id="@+id/side_bar"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right|center"/>
+        </FrameLayout>
+
+        <!--<me.jiudeng.purchase.view.SideBar-->
+            <!--android:id="@+id/side_bar"-->
+            <!--android:layout_width="15dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="right|center"/>-->
+    </LinearLayout>
+</LinearLayout>

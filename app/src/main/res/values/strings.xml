@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">采购员App</string>
+    <string name="login">登录</string>
+    <string name="log_out">退出</string>
+    <string name="send_msg">上传</string>
+    <string name="pay_sum">采购金额合计:</string>
+    <string name="pay_sum_zero">100</string>
+    <string name="num">序号</string>
+    <string name="prduct_name">商品名称/"\n"规格</string>
+    <string name="price_line">线上价格/"\n"采购价</string>
+    <string name="pur_num">订购量/"\n"采购量</string>
+    <string name="money_line">线上金额/"\n"采购金额</string>
+    <string name="itemName">白菜</string>
+    <string name="pur_man">采购员</string>
+    <string name="input_pwd">请输入密码</string>
+    <string name="input_usr">请输入账号</string>
+    <string name="log_out_sure">确定退出？</string>
+    <string name="sure">确定</string>
+    <string name="cancel">取消</string>
+    <string name="uer_error">账号或密码错误！</string>
+</resources>

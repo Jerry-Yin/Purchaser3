@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:layout_marginBottom="10dp"
+    android:layout_marginTop="10dp"
+    android:background="#ffffff"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tv_orde"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="0.3"
+        android:gravity="center"
+        android:paddingLeft="6dp"
+        android:text="@string/pay_sum_zero"
+        android:textSize="10sp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_pord_name"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="5dp"
+            android:text="@string/itemName"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tv_prod_mount"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:text="000g"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:text="￥"
+                android:textSize="13sp"
+                android:paddingLeft="10dp"/>
+
+            <TextView
+                android:id="@+id/tv_price_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal|left"
+                android:paddingTop="5dp"
+                android:paddingLeft="15dp"
+                android:text="0.0"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="￥"
+                android:textSize="13sp"
+                android:paddingLeft="10dp"/>
+
+            <EditText
+                android:id="@+id/et_price_pur"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|left"
+                android:paddingTop="30dp"
+                android:text="0.0"
+                android:textSize="13sp"
+                android:paddingLeft="15dp"
+                android:numeric="integer|decimal"/>
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_mount_ding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:focusable="false"
+            android:paddingTop="5dp"
+            android:text="000"
+            android:textSize="13sp"/>
+
+        <EditText
+            android:id="@+id/et_mount_pur"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:paddingTop="30dp"
+            android:text="000"
+            android:textSize="13sp"
+            android:numeric="integer|decimal"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="￥"
+                android:textSize="13sp"
+                android:paddingTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="￥"
+                android:textSize="13sp"
+                android:gravity="center"/>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:orientation="vertical"
+            android:paddingLeft="15dp">
+
+            <TextView
+                android:id="@+id/tv_money_line"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingTop="5dp"
+                android:text="000"
+                android:textSize="13sp"
+                />
+
+            <TextView
+                android:id="@+id/tv_money_pur"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingBottom="10dp"
+                android:text="000"
+                android:textSize="13sp"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
