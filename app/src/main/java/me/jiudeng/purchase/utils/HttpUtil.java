@@ -25,7 +25,7 @@ import me.jiudeng.purchase.module.LoginResponse;
 public class HttpUtil {
 
     private static final String TAG = "HttpUtil";
-    public static String addressData = "http://10.0.0.165:9999/WarehouseOrder/PurchaseTruthInfo";  //服务器地址
+    public static String addressGetData = "http://10.0.0.165:9999/WarehouseOrder/PurchaseTruthInfo";  //服务器地址
     public static String addressUsr = "http://10.0.0.165:9999/warehouseorder/loginnormal";    //账户验证地址
 
 
