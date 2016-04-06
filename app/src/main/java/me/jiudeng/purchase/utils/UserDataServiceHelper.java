@@ -1,6 +1,7 @@
 package me.jiudeng.purchase.utils;
 
-import android.util.Log;
+import me.jiudeng.purchase.listener.OnResponseListener;
+import me.jiudeng.purchase.network.HttpUtil;
 
 /**
  * Created by Yin on 2016/3/29.

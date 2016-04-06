@@ -1,5 +1,7 @@
 package me.jiudeng.purchase.module;
 
+import java.math.BigDecimal;
+
 /**
  * Created by Yin on 2016/3/29.
  * 所有清单信息
@@ -11,9 +13,9 @@ public class PurchaseData {
      *
      InfoId       int       //采购员采购表id
      PurchaseId   int       //采购单id
-     SellPrize    float64   //线上售价              3
-     BuyPrize     float64   //采购价                4
-     NeedNumber   float64   //采购需求量            6
+     SellPrize    float   //线上售价              3
+     BuyPrize     float   //采购价                4
+     NeedNumber   float64   //定购量            6
      Operator     string    //采购员
      ItemId       int       //物品id
      ItemName     string    //物品名称              1
@@ -22,12 +24,12 @@ public class PurchaseData {
      TheoryTime   time.Time //仓库总采购单生成时间
      PurchaseTime time.Time //采购员采购单生成时间
 
-     /** 提交的数据格式
-     Id             int
-     PurchaseTheory int       //采购单id
-     Price          int       //单价(单位厘 1/1000元)
-     Number         float64   //采购数量
+     /** 提交的数据格式(4个)
+     PurchaseTheory int       //采购单id                       <--->PurchasedId</--->
+     Price          int       //单价(单位厘 1/1000元) X1000    <--->自己填的</--->
+     Number         float64   //采购数量                       <--->自己填的</--->
      Operator       string    //采购员
+
      CreateTime     time.Time //创建时间
      */
 
@@ -35,7 +37,10 @@ public class PurchaseData {
     private int PurchaseId;
     private float SellPrice;
     private float BuyPrice;
-    private float NeedNumbre;
+    private float NeedNumber;   //订购量
+    private float MountPur; //采购量 ，返回的数据中没有的
+    private float MoneyPur;
+
     private String Operator;
     private int ItemId;
     private String ItemName;
@@ -83,11 +88,27 @@ public class PurchaseData {
     }
 
     public float getNeedNumbre() {
-        return NeedNumbre;
+        return NeedNumber;
     }
 
     public void setNeedNumbre(float needNumbre) {
-        NeedNumbre = needNumbre;
+        NeedNumber = needNumbre;
+    }
+
+    public float getMountPur() {
+        return MountPur;
+    }
+
+    public void setMountPur(float mountPur) {
+        MountPur = mountPur;
+    }
+
+    public float getMoneyPur() {
+        return MoneyPur;
+    }
+
+    public void setMoneyPur(float moneyPur) {
+        MoneyPur = moneyPur;
     }
 
     public String getOperator() {

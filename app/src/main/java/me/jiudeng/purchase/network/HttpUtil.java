@@ -1,22 +1,19 @@
-package me.jiudeng.purchase.utils;
+package me.jiudeng.purchase.network;
 
 import android.util.Log;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.PublicKey;
 
-import me.jiudeng.purchase.module.LoginResponse;
+import me.jiudeng.purchase.listener.OnResponseListener;
 
 /**
  * Created by Yin on 2016/3/29.
@@ -25,16 +22,18 @@ import me.jiudeng.purchase.module.LoginResponse;
 public class HttpUtil {
 
     private static final String TAG = "HttpUtil";
-    public static String addressGetData = "http://10.0.0.165:9999/WarehouseOrder/PurchaseTruthInfo";  //服务器地址
+    public static String addressGetData = "http://10.0.0.165:9999/warehouseorder/OperatorPurchase";  //请求数据服务器地址
+    public static String addressPushData = "http://10.0.0.165:9999/warehouseorder/PurchaseTruthInfo";  //提交数据服务器地址
     public static String addressUsr = "http://10.0.0.165:9999/warehouseorder/loginnormal";    //账户验证地址
 
 
     /**
      * 请求数据
      * @param address
+     * @param usr
      * @param listener
      */
-    public static void SendHttpRequest(final String address, final OnResponseListener listener) {
+    public static void SendHttpRequest(final String address, final String usr, final OnResponseListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -45,6 +44,14 @@ public class HttpUtil {
                     connection.setRequestMethod("POST");
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
+
+//                    String data = "Operator=123";
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Conent-Length", usr.length() + "");
+
+                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                    outputStream.write(usr.getBytes());
 
                     InputStream inputStream = connection.getInputStream();
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream);

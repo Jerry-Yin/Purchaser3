@@ -19,9 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.jiudeng.purchase.R;
-import me.jiudeng.purchase.utils.HttpUtil;
+import me.jiudeng.purchase.network.HttpUtil;
 import me.jiudeng.purchase.utils.NetWorkStateUtil;
-import me.jiudeng.purchase.utils.OnResponseListener;
+import me.jiudeng.purchase.listener.OnResponseListener;
 
 public class LoginActivity extends Activity implements View.OnClickListener {
 

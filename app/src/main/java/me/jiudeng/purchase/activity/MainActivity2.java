@@ -36,18 +36,17 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import me.jiudeng.purchase.R;
+import me.jiudeng.purchase.listener.OnResponseListener;
 import me.jiudeng.purchase.module.PurchaseData;
+import me.jiudeng.purchase.network.HttpUtil;
 import me.jiudeng.purchase.utils.CharacterParser;
 import me.jiudeng.purchase.utils.FileUtil;
 import me.jiudeng.purchase.utils.GetFirstAlp;
-import me.jiudeng.purchase.network.HttpUtil;
-import me.jiudeng.purchase.listener.OnResponseListener;
 import me.jiudeng.purchase.utils.PinyinComparator;
 import me.jiudeng.purchase.utils.SaveFileUtil;
 import me.jiudeng.purchase.utils.TimeTaskUtil;
@@ -55,9 +54,9 @@ import me.jiudeng.purchase.view.SideBar;
 
 /**
  * Created by Yin on 2016/3/29.
- * ListView 版本
+ * RecyclerView 版本
  */
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity2 extends Activity implements View.OnClickListener {
 
     private static String TAG = "MainActivity";
     private static final int REFRESH_DATA = 0;
@@ -74,6 +73,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView mTvPaySum;     //采购金额合计
     private TextView mTvCurDialog;  //显示当前字母
     private SideBar mSideBar;
+    private RecyclerView mRecyclerView;
 
     /**
      * Values
@@ -82,6 +82,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private List<PurchaseData> mPurchaseList = new ArrayList<>();
     private CharacterParser mCharacterParser; //汉字转换成拼音的类
     private PinyinComparator mPinyinComparator; //根据拼音来排列ListView里面的数据类
+    private RecyclerViewAdapter mRecyclerAdapter;
+    private LinearLayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,25 +103,37 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mSideBar = (SideBar) findViewById(R.id.side_bar);
         mSideBar.setTextView(mTvCurDialog);
         mListView = (ListView) findViewById(R.id.list_view);
-        //设置右侧触摸监听
-        mSideBar.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
 
-            @Override
-            public void onTouchingLetterChanged(String s) {
-                //该字母首次出现的位置
-                int position = mListAdapter.getPositionForSection(s.charAt(0));
-                if (position != -1) {
-                    mListView.setSelection(position);
-                }
-            }
-        });
-        mListAdapter = new PurchaseListAdapter(MainActivity.this);
-        mListView.setAdapter(mListAdapter);
+//        mListAdapter = new PurchaseListAdapter(MainActivity2.this);
+//        mListView.setAdapter(mListAdapter);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycle_view);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+//        //如果可以确定每个item的高度是固定的，设置这个选项可以提高性能
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerAdapter = new RecyclerViewAdapter(MainActivity2.this);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
+
+//        //设置右侧触摸监听
+//        mSideBar.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
+//
+//            @Override
+//            public void onTouchingLetterChanged(String s) {
+//                //该字母首次出现的位置
+//                int position = mListAdapter.getPositionForSection(s.charAt(0));
+////                int position = mRecyclerAdapter.
+//                if (position != -1) {
+//                    mListView.setSelection(position);
+//
+//                }
+//            }
+//        });
     }
 
     private void initData() {
         // TODO: 2016/4/5 先判断本地数据是否存在，存在则加载本地数据，否则请求网络数据
-        String fileContent = FileUtil.readFile(MainActivity.this);
+        String fileContent = FileUtil.readFile(MainActivity2.this);
         final Message message = new Message();
         Log.d(TAG, "初始化数据...");
         if (!TextUtils.isEmpty(fileContent)) {
@@ -128,7 +142,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 Log.d(TAG, "成功读取本地文件数据，加载...");
                 message.what = REFRESH_DATA;
                 mHandler.sendMessage(message);
-                mListAdapter.notifyDataSetChanged();
+//                mListAdapter.notifyDataSetChanged();
+//                mRecyclerAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -191,20 +206,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     Log.d(TAG, "排序后的 mPurchaseList = " + mPurchaseList.toString());
 //                    mListAdapter = new PurchaseListAdapter(MainActivity.this, mPurchaseList);
 //                    mListView.setAdapter(mListAdapter);
-                    mListAdapter.notifyDataSetChanged();
+//                    mListAdapter.notifyDataSetChanged();
 
+//                    mRecyclerAdapter = new RecyclerViewAdapter(MainActivity2.this);
+//                    mRecyclerView.setAdapter(mRecyclerAdapter);
+                    mRecyclerAdapter.notifyDataSetChanged();
                     saveDataToFile();//请求成功后将数据保存到本地
 //                    new TimeTaskUtil(MainActivity.this).startTimeTask();   //开启定时上传功能
                     break;
 
                 case SEND_SUCCESS:
 
-                    Toast.makeText(MainActivity.this, "上传完毕！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity2.this, "上传完毕！", Toast.LENGTH_SHORT).show();
                     break;
 
                 case SEND_FAIL:
 
-                    Toast.makeText(MainActivity.this, "上传失败，请重新上传！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity2.this, "上传失败，请重新上传！", Toast.LENGTH_SHORT).show();
                     break;
 
                 default:
@@ -255,7 +273,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void showDialogIos() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity2.this);
         final Dialog dialog = builder.create();
         LinearLayout layout = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.layout_ios_dialog, null);
         dialog.show();
@@ -266,8 +284,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             public void onClick(View v) {
                 // TODO: 2016/3/30 删除账号信息
                 logOut();
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                MainActivity.this.finish();
+                startActivity(new Intent(MainActivity2.this, LoginActivity.class));
+                MainActivity2.this.finish();
             }
         });
         layout.findViewById(R.id.btn_negative).setOnClickListener(new View.OnClickListener() {
@@ -289,7 +307,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void showDialogOld() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity2.this);
         builder.setMessage("确定退出？");
         builder.setCancelable(false);
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -297,8 +315,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             public void onClick(DialogInterface dialog, int which) {
                 // TODO: 2016/3/30 删除账号信息
 
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                MainActivity.this.finish();
+                startActivity(new Intent(MainActivity2.this, LoginActivity.class));
+                MainActivity2.this.finish();
             }
         });
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -320,7 +338,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         private List<PurchaseData> mDataList;
         private int order = 0;
 
-        public class ViewHolder {
+        private class ViewHolder {
             private TextView tvOrder;                  //序号
             private TextView tvProdName, tvProdMount;   //商品名称 & 规格
             private TextView tvPriceLine;       //线上价格
@@ -328,8 +346,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             private TextView tvMountDing;       //订购量
             private EditText etMountPur;        //采购量
             private TextView tvMoneyLine, tvMoneyPur;   //线上金额 & 采购金额
-
-            private int key;
         }
 
         public PurchaseListAdapter(Context c, List<PurchaseData> mPurchaseList) {
@@ -363,51 +379,56 @@ public class MainActivity extends Activity implements View.OnClickListener {
             ViewHolder holder = null;
             if (convertView == null) {
                 holder = new ViewHolder();
-                Log.d(TAG, "posi = "+position);
                 convertView = inflater.inflate(R.layout.layout_item, null);
                 holder.tvOrder = (TextView) convertView.findViewById(R.id.tv_orde);
                 holder.tvProdName = (TextView) convertView.findViewById(R.id.tv_pord_name);
                 holder.tvProdMount = (TextView) convertView.findViewById(R.id.tv_prod_mount);
                 holder.tvPriceLine = (TextView) convertView.findViewById(R.id.tv_price_line);
                 holder.etPricePur = (EditText) convertView.findViewById(R.id.et_price_pur);
-//                holder.etPricePur.setInputType(EditorInfo.TYPE_CLASS_NUMBER);    //数字键盘
-                holder.etPricePur.setOnTouchListener(new CustomOnTouchListener(position, holder.etPricePur, 1));
-                holder.etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR, holder));
+                holder.etPricePur.setInputType(EditorInfo.TYPE_CLASS_PHONE);    //数字键盘
+                holder.etPricePur.setOnTouchListener(new CustomOnTouchListener(position, 1));
+                holder.etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR));
                 holder.tvMountDing = (TextView) convertView.findViewById(R.id.tv_mount_ding);
                 holder.etMountPur = (EditText) convertView.findViewById(R.id.et_mount_pur);
-//                holder.etMountPur.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
-                holder.etMountPur.setOnTouchListener(new CustomOnTouchListener(position, holder.etMountPur, 2));
-                holder.etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR, holder));
+                holder.etMountPur.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+                holder.etMountPur.setOnTouchListener(new CustomOnTouchListener(position, 2));
+                holder.etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR));
                 holder.tvMoneyLine = (TextView) convertView.findViewById(R.id.tv_money_line);
                 holder.tvMoneyPur = (TextView) convertView.findViewById(R.id.tv_money_pur);
                 convertView.setTag(holder);
             }
-              else {
-                holder = (ViewHolder) convertView.getTag();
-
+            holder.etPricePur.clearFocus();
+            holder.etMountPur.clearFocus();
+            if (mCurTouchIndex == position) {
+                // 如果当前的行下标和点击事件中保存的index一致，手动为EditText设置焦点。
+                holder.etPricePur.requestFocus();
+                holder.etPricePur.setSelection(holder.etPricePur.getText().length());
+                mCurTouchIndex = -1;
             }
+            if (mCurTouchIndex2 == position){
+                holder.etMountPur.requestFocus();
+                holder.etMountPur.setSelection(holder.etMountPur.getText().length());
+                mCurTouchIndex2 = -1;
+            }
+//            holder.etPricePur.setSelection( holder.etPricePur .getText().length());
 
             // TODO 从数据list中取出数据并对应的设置
             int order = position + 1;
-            holder.key = position;
-//            holder.etMountPur.setTag(position);
-
             PurchaseData purchaseData = mPurchaseList.get(position);
             holder.tvOrder.setText(String.valueOf(order));
             holder.tvProdName.setText(purchaseData.getItemName());
             holder.tvProdMount.setText(purchaseData.getUnit());
             holder.tvPriceLine.setText(String.valueOf(purchaseData.getSellPrice() / 1000));
-
-            Log.d(TAG, "i =" + position + " data = " + purchaseData.getBuyPrice());
             if (!(String.valueOf(purchaseData.getBuyPrice()) == null)){
                 holder.etPricePur.setText(String.valueOf(purchaseData.getBuyPrice()));
             }else {
                 holder.etPricePur.setText("0");
             }
-
             holder.tvMountDing.setText(String.valueOf(purchaseData.getNeedNumbre()));
+
             float moneyLine = purchaseData.getSellPrice() / 1000 *purchaseData.getNeedNumbre();
             holder.tvMoneyLine.setText(String.valueOf(moneyLine));
+
             holder.etMountPur.setText(String.valueOf(purchaseData.getMountPur()));
 
             float mountPur = Float.valueOf(holder.etMountPur.getText().toString());
@@ -415,23 +436,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             holder.tvMoneyPur.setText(String.valueOf(moneyPur));
             purchaseData.setMoneyPur(moneyPur);
-
-            holder.etPricePur.clearFocus();
-            holder.etMountPur.clearFocus();
-            if (mCurTouchIndex == position) {
-                // 如果当前的行下标和点击事件中保存的index一致，手动为EditText设置焦点。
-                holder.etPricePur.requestFocus();
-                holder.etPricePur.setText("");
-//                holder.etPricePur.setSelection(holder.etPricePur.getText().length());
-                mCurTouchIndex = -1;
-            }
-            if (mCurTouchIndex2 == position){
-                holder.etMountPur.requestFocus();
-                holder.etMountPur.setText("");
-//                holder.etMountPur.setSelection(holder.etMountPur.getText().length());
-                mCurTouchIndex2 = -1;
-            }
-//            holder.etPricePur.setSelection( holder.etPricePur .getText().length());
 
             return convertView;
         }
@@ -474,21 +478,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
     class CustomTextWatcher implements TextWatcher {
 
         private EditText mEt;
-//        private int mPosition;
+        private int mPosition;
         private int flag;
-        private PurchaseListAdapter.ViewHolder viewHolder;
 
-
-        public CustomTextWatcher(EditText e, int p, int flag, PurchaseListAdapter.ViewHolder holder) {
+        public CustomTextWatcher(EditText e, int p, int flag) {
             this.mEt = e;
-//            this.mPosition = p;
+            this.mPosition = p;
             this.flag = flag;
-            this.viewHolder = holder;
         }
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
         }
 
         @Override
@@ -503,50 +503,46 @@ public class MainActivity extends Activity implements View.OnClickListener {
          */
         @Override
         public void afterTextChanged(Editable s) {
-
-                if (flag == PRICE_PUR) {
-                    Log.d(TAG, "flag2 =" + flag);
-                    if (!TextUtils.isEmpty(s)) {
-                        Log.d(TAG, "i =" + viewHolder.key + " s = " + s.toString());
-                        mPurchaseList.get(viewHolder.key).setBuyPrice(Float.valueOf(s.toString()));
-                    }
+            if (flag == PRICE_PUR) {
+                if (!TextUtils.isEmpty(s)) {
+                    mPurchaseList.get(mPosition).setBuyPrice(Float.valueOf(s.toString()));
                 }
-                if (flag == MOUNT_PUR) {
-                    if (!TextUtils.isEmpty(s)) {
-                        mPurchaseList.get(viewHolder.key).setMountPur(Float.valueOf(s.toString()));
-                    }
+            }
+            if (flag == MOUNT_PUR) {
+                if (!TextUtils.isEmpty(s)) {
+                    mPurchaseList.get(mPosition).setMountPur(Float.valueOf(s.toString()));
                 }
+            }
+            float sumMoney = 0;
+            for (PurchaseData data : mPurchaseList){
+                sumMoney += data.getMoneyPur();
+            }
+            mTvPaySum.setText(String.valueOf(sumMoney));
 //            mListAdapter.notifyDataSetChanged();
-                float sumMoney = 0;
-                for (PurchaseData data : mPurchaseList){
-                    sumMoney += data.getMoneyPur();
-                }
-                mTvPaySum.setText(String.valueOf(sumMoney));
-//            mListAdapter.notifyDataSetChanged();
-                saveDataToFile();
-
+//            mRecyclerAdapter.notifyDataSetChanged();
+            saveDataToFile();
         }
     }
 
     public void saveDataToFile() {
         if (mPurchaseList != null) {
-//            Log.d(TAG, "存储的 mPurchaseList = " + mPurchaseList.toString());
+            Log.d(TAG, "存储的 mPurchaseList = " + mPurchaseList.toString());
             String jsonObject = new Gson().toJson(mPurchaseList);
 //            String data = mPurchaseList.toString();
-//            Log.d(TAG, "存储的 mPurchaseList 转化后 = " + jsonObject.toString());
-            new SaveFileUtil(MainActivity.this, jsonObject).saveDataToFile();
+            Log.d(TAG, "存储的 mPurchaseList 转化后 = " + jsonObject.toString());
+            new SaveFileUtil(MainActivity2.this, jsonObject).saveDataToFile();
         }
     }
 
     class CustomOnTouchListener implements View.OnTouchListener {
 
         private int position;
-        private EditText text;
+//        private EditText text;
         private int flag;
 
-        public CustomOnTouchListener(int position, EditText text, int flag) {
+        public CustomOnTouchListener(int position, int flag) {
             this.position = position;
-            this.text = text;
+//            this.text = text;
             this.flag = flag;
         }
 
@@ -558,9 +554,97 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }if (flag == 2){
                     mCurTouchIndex2 = position;
                 }
-                text.setText("");
+//                text.requestFocus();
             }
             return false;
+        }
+    }
+
+
+
+
+
+    /**
+     * RecyclerView 适配器
+     */
+    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder>{
+
+        private Context mContext;
+        private List<PurchaseData> mDataList;
+
+        public RecyclerViewAdapter(Context mContext, List<PurchaseData> list) {
+            this.mContext = mContext;
+            this.mDataList = list;
+        }
+
+        public RecyclerViewAdapter(Context mContext) {
+            this.mContext = mContext;
+        }
+
+        //CustomViewHolder，用于缓存，提高效率
+        public  class CustomViewHolder extends RecyclerView.ViewHolder {
+            private TextView tvOrder;                  //序号
+            private TextView tvProdName, tvProdMount;   //商品名称 & 规格
+            private TextView tvPriceLine;       //线上价格
+            private EditText etPricePur;        //采购价格
+            private TextView tvMountDing;       //订购量
+            private EditText etMountPur;        //采购量
+            private TextView tvMoneyLine, tvMoneyPur;   //线上金额 & 采购金额
+
+            public CustomViewHolder(View itemView) {
+                super(itemView);
+                tvOrder = (TextView) itemView.findViewById(R.id.tv_orde);
+                tvProdName = (TextView) itemView.findViewById(R.id.tv_pord_name);
+                tvProdMount = (TextView) itemView.findViewById(R.id.tv_prod_mount);
+                tvPriceLine = (TextView) itemView.findViewById(R.id.tv_price_line);
+                etPricePur = (EditText) itemView.findViewById(R.id.et_price_pur);
+                etPricePur.setInputType(EditorInfo.TYPE_CLASS_PHONE);    //数字键盘
+//            etPricePur.setOnTouchListener(new CustomOnTouchListener(position, 1));
+//                etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR));
+                tvMountDing = (TextView) itemView.findViewById(R.id.tv_mount_ding);
+                etMountPur = (EditText) itemView.findViewById(R.id.et_mount_pur);
+                etMountPur.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+//            etMountPur.setOnTouchListener(new CustomOnTouchListener(position, 2));
+//                etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR));
+                tvMoneyLine = (TextView) itemView.findViewById(R.id.tv_money_line);
+                tvMoneyPur = (TextView) itemView.findViewById(R.id.tv_money_pur);
+            }
+        }
+
+        @Override
+        public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(mContext).inflate(R.layout.layout_item, parent, false);
+            return new CustomViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(CustomViewHolder viewHolder, int position) {
+            PurchaseData data = mPurchaseList.get(position);
+            int order = position + 1;
+            viewHolder.tvOrder.setText(String.valueOf(order));
+            viewHolder.tvProdName.setText(data.getItemName());
+            viewHolder.tvProdMount.setText(data.getUnit());
+            viewHolder.tvPriceLine.setText(String.valueOf(data.getSellPrice() / 1000));
+            viewHolder.etPricePur.setText(String.valueOf(data.getBuyPrice()));
+            viewHolder.etPricePur.addTextChangedListener(new CustomTextWatcher(viewHolder.etPricePur, position, PRICE_PUR));
+            viewHolder.tvMountDing.setText(String.valueOf(data.getNeedNumbre()));
+
+            float moneyLine = data.getSellPrice() / 1000 * data.getNeedNumbre();
+            viewHolder.tvMoneyLine.setText(String.valueOf(moneyLine));
+
+            viewHolder.etMountPur.setText(String.valueOf(data.getMountPur()));
+//            viewHolder.etMountPur.addTextChangedListener(new CustomTextWatcher(viewHolder.etMountPur, position, MOUNT_PUR));
+
+            float mountPur = Float.valueOf(viewHolder.etMountPur.getText().toString());
+            float moneyPur = data.getBuyPrice() * mountPur;
+
+            viewHolder.tvMoneyPur.setText(String.valueOf(moneyPur));
+            data.setMoneyPur(moneyPur);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mPurchaseList.size();
         }
     }
 
@@ -600,7 +684,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onDestroy() {
-        new TimeTaskUtil(MainActivity.this).stopTimeTask();
+        new TimeTaskUtil(MainActivity2.this).stopTimeTask();
         super.onDestroy();
     }
 }

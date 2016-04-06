@@ -4,7 +4,7 @@
     <string name="log_out">退出</string>
     <string name="send_msg">上传</string>
     <string name="pay_sum">采购金额合计:</string>
-    <string name="pay_sum_zero">100</string>
+    <string name="pay_sum_zero">0.00</string>
     <string name="num">序号</string>
     <string name="prduct_name">商品名称/"\n"规格</string>
     <string name="price_line">线上价格/"\n"采购价</string>
