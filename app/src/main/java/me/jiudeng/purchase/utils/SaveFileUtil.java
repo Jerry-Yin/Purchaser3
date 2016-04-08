@@ -57,6 +57,7 @@ public class SaveFileUtil {
                     if (writer != null) {
                         try {
                             writer.close();
+                            outputStream.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

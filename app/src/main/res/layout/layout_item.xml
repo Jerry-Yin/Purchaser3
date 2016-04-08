@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:layout_marginTop="10dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginTop="5dp"
     android:background="#ffffff"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:minHeight="?android:attr/listPreferredItemHeight">
 
     <TextView
         android:id="@+id/tv_orde"
@@ -100,8 +101,8 @@
                 android:text="0.0"
                 android:textSize="13sp"
                 android:paddingLeft="5dp"
-                android:numeric="integer|decimal"
-                android:inputType="number"/>
+                android:inputType="number|numberDecimal"/>
+            <!--android:numeric="decimal|integer"-->
         </LinearLayout>
     </FrameLayout>
 
@@ -132,8 +133,8 @@
             android:paddingTop="30dp"
             android:text="000"
             android:textSize="13sp"
-            android:numeric="integer|decimal"
-            android:inputType="number"/>
+            android:inputType="number|numberDecimal"/>
+        <!--android:numeric="decimal|integer"-->
     </FrameLayout>
 
     <LinearLayout
@@ -180,8 +181,7 @@
                 android:layout_weight="1"
                 android:layout_marginTop="5dp"
                 android:text="000"
-                android:textSize="13sp"
-                />
+                android:textSize="13sp"/>
 
             <TextView
                 android:id="@+id/tv_money_pur"

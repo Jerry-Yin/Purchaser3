@@ -56,7 +56,7 @@ import me.jiudeng.purchase.view.SideBar;
  * Created by Yin on 2016/3/29.
  * RecyclerView 版本
  */
-public class MainActivity2 extends Activity implements View.OnClickListener {
+public class MainActivity2 extends BaseActivity implements View.OnClickListener {
 
     private static String TAG = "MainActivity";
     private static final int REFRESH_DATA = 0;
@@ -68,7 +68,6 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
     /**
      * Views
      */
-    private ListView mListView;
     private Button mBtnLogOut, mBtnSend;
     private TextView mTvPaySum;     //采购金额合计
     private TextView mTvCurDialog;  //显示当前字母
@@ -78,7 +77,6 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
     /**
      * Values
      */
-    private PurchaseListAdapter mListAdapter;
     private List<PurchaseData> mPurchaseList = new ArrayList<>();
     private CharacterParser mCharacterParser; //汉字转换成拼音的类
     private PinyinComparator mPinyinComparator; //根据拼音来排列ListView里面的数据类
@@ -102,10 +100,6 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
         mTvCurDialog = (TextView) findViewById(R.id.tv_dialog);
         mSideBar = (SideBar) findViewById(R.id.side_bar);
         mSideBar.setTextView(mTvCurDialog);
-        mListView = (ListView) findViewById(R.id.list_view);
-
-//        mListAdapter = new PurchaseListAdapter(MainActivity2.this);
-//        mListView.setAdapter(mListAdapter);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycle_view);
         mLayoutManager = new LinearLayoutManager(this);
@@ -142,7 +136,6 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
                 Log.d(TAG, "成功读取本地文件数据，加载...");
                 message.what = REFRESH_DATA;
                 mHandler.sendMessage(message);
-//                mListAdapter.notifyDataSetChanged();
 //                mRecyclerAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -204,14 +197,11 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
                     // 根据a-z进行排序源数据
                     Collections.sort(mPurchaseList, mPinyinComparator);
                     Log.d(TAG, "排序后的 mPurchaseList = " + mPurchaseList.toString());
-//                    mListAdapter = new PurchaseListAdapter(MainActivity.this, mPurchaseList);
-//                    mListView.setAdapter(mListAdapter);
-//                    mListAdapter.notifyDataSetChanged();
 
 //                    mRecyclerAdapter = new RecyclerViewAdapter(MainActivity2.this);
 //                    mRecyclerView.setAdapter(mRecyclerAdapter);
                     mRecyclerAdapter.notifyDataSetChanged();
-                    saveDataToFile();//请求成功后将数据保存到本地
+//                    saveDataToFile();//请求成功后将数据保存到本地
 //                    new TimeTaskUtil(MainActivity.this).startTimeTask();   //开启定时上传功能
                     break;
 
@@ -386,13 +376,13 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
                 holder.tvPriceLine = (TextView) convertView.findViewById(R.id.tv_price_line);
                 holder.etPricePur = (EditText) convertView.findViewById(R.id.et_price_pur);
                 holder.etPricePur.setInputType(EditorInfo.TYPE_CLASS_PHONE);    //数字键盘
-                holder.etPricePur.setOnTouchListener(new CustomOnTouchListener(position, 1));
-                holder.etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR));
+//                holder.etPricePur.setOnTouchListener(new CustomOnTouchListener(position, 1));
+//                holder.etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR));
                 holder.tvMountDing = (TextView) convertView.findViewById(R.id.tv_mount_ding);
                 holder.etMountPur = (EditText) convertView.findViewById(R.id.et_mount_pur);
                 holder.etMountPur.setInputType(EditorInfo.TYPE_CLASS_PHONE);
-                holder.etMountPur.setOnTouchListener(new CustomOnTouchListener(position, 2));
-                holder.etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR));
+//                holder.etMountPur.setOnTouchListener(new CustomOnTouchListener(position, 2));
+//                holder.etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR));
                 holder.tvMoneyLine = (TextView) convertView.findViewById(R.id.tv_money_line);
                 holder.tvMoneyPur = (TextView) convertView.findViewById(R.id.tv_money_pur);
                 convertView.setTag(holder);
@@ -405,7 +395,7 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
                 holder.etPricePur.setSelection(holder.etPricePur.getText().length());
                 mCurTouchIndex = -1;
             }
-            if (mCurTouchIndex2 == position){
+            if (mCurTouchIndex2 == position) {
                 holder.etMountPur.requestFocus();
                 holder.etMountPur.setSelection(holder.etMountPur.getText().length());
                 mCurTouchIndex2 = -1;
@@ -419,14 +409,14 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
             holder.tvProdName.setText(purchaseData.getItemName());
             holder.tvProdMount.setText(purchaseData.getUnit());
             holder.tvPriceLine.setText(String.valueOf(purchaseData.getSellPrice() / 1000));
-            if (!(String.valueOf(purchaseData.getBuyPrice()) == null)){
+            if (!(String.valueOf(purchaseData.getBuyPrice()) == null)) {
                 holder.etPricePur.setText(String.valueOf(purchaseData.getBuyPrice()));
-            }else {
+            } else {
                 holder.etPricePur.setText("0");
             }
             holder.tvMountDing.setText(String.valueOf(purchaseData.getNeedNumbre()));
 
-            float moneyLine = purchaseData.getSellPrice() / 1000 *purchaseData.getNeedNumbre();
+            float moneyLine = purchaseData.getSellPrice() / 1000 * purchaseData.getNeedNumbre();
             holder.tvMoneyLine.setText(String.valueOf(moneyLine));
 
             holder.etMountPur.setText(String.valueOf(purchaseData.getMountPur()));
@@ -447,6 +437,7 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
 
         /**
          * 根据首字母的ascii值来获取在该ListView中第一次出现该首字母的位置
+         *
          * @param sectionIndex
          * @return
          */
@@ -465,6 +456,7 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
 
         /**
          * 根据ListView的position来获取该位置上面的name的首字母char的ascii值
+         *
          * @param position
          * @return
          */
@@ -478,17 +470,19 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
     class CustomTextWatcher implements TextWatcher {
 
         private EditText mEt;
-        private int mPosition;
         private int flag;
+        private RecyclerViewAdapter.CustomViewHolder holder;
+        private String textBefore;
 
-        public CustomTextWatcher(EditText e, int p, int flag) {
+        public CustomTextWatcher(EditText e, int flag, RecyclerViewAdapter.CustomViewHolder viewHolder) {
             this.mEt = e;
-            this.mPosition = p;
             this.flag = flag;
+            this.holder = viewHolder;
         }
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            textBefore = s.toString();
         }
 
         @Override
@@ -499,28 +493,38 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
         /**
          * 改变之后， 把修改后的数据保存到本地数据
          * 修改一次，保存一次
+         *
          * @param s
          */
         @Override
         public void afterTextChanged(Editable s) {
-            if (flag == PRICE_PUR) {
-                if (!TextUtils.isEmpty(s)) {
-                    mPurchaseList.get(mPosition).setBuyPrice(Float.valueOf(s.toString()));
-                }
+            if (TextUtils.isEmpty(s)) {
+                return;
             }
-            if (flag == MOUNT_PUR) {
-                if (!TextUtils.isEmpty(s)) {
-                    mPurchaseList.get(mPosition).setMountPur(Float.valueOf(s.toString()));
+            if (s.toString() == textBefore) {
+                return;
+            }
+            else {
+                if (flag == PRICE_PUR) {
+                    mPurchaseList.get(holder.key).setBuyPrice(Float.valueOf(s.toString()));
+//                    View view = (View) mEt.getParent().getParent().getParent();
+//                    if (view != null) {
+//                        view.setBackgroundColor(getResources().getColor(R.color.colorSelec));
+//                    }
                 }
+                if (flag == MOUNT_PUR) {
+                    Log.d(TAG, " holder.key = " + holder.key);
+                    Log.d(TAG, " txtBefore = " + textBefore);
+                    Log.d(TAG, " S = " + s + "\n");
+                    mPurchaseList.get(holder.key).setMountPur(Float.valueOf(s.toString()));
+                }
+//                saveDataToFile();
             }
             float sumMoney = 0;
-            for (PurchaseData data : mPurchaseList){
+            for (PurchaseData data : mPurchaseList) {
                 sumMoney += data.getMoneyPur();
             }
             mTvPaySum.setText(String.valueOf(sumMoney));
-//            mListAdapter.notifyDataSetChanged();
-//            mRecyclerAdapter.notifyDataSetChanged();
-            saveDataToFile();
         }
     }
 
@@ -537,7 +541,7 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
     class CustomOnTouchListener implements View.OnTouchListener {
 
         private int position;
-//        private EditText text;
+        //        private EditText text;
         private int flag;
 
         public CustomOnTouchListener(int position, int flag) {
@@ -548,10 +552,11 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_UP){
-                if (flag == 1){
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (flag == 1) {
                     mCurTouchIndex = position;
-                }if (flag == 2){
+                }
+                if (flag == 2) {
                     mCurTouchIndex2 = position;
                 }
 //                text.requestFocus();
@@ -561,13 +566,10 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
     }
 
 
-
-
-
     /**
      * RecyclerView 适配器
      */
-    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder>{
+    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.CustomViewHolder> {
 
         private Context mContext;
         private List<PurchaseData> mDataList;
@@ -581,59 +583,31 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
             this.mContext = mContext;
         }
 
-        //CustomViewHolder，用于缓存，提高效率
-        public  class CustomViewHolder extends RecyclerView.ViewHolder {
-            private TextView tvOrder;                  //序号
-            private TextView tvProdName, tvProdMount;   //商品名称 & 规格
-            private TextView tvPriceLine;       //线上价格
-            private EditText etPricePur;        //采购价格
-            private TextView tvMountDing;       //订购量
-            private EditText etMountPur;        //采购量
-            private TextView tvMoneyLine, tvMoneyPur;   //线上金额 & 采购金额
-
-            public CustomViewHolder(View itemView) {
-                super(itemView);
-                tvOrder = (TextView) itemView.findViewById(R.id.tv_orde);
-                tvProdName = (TextView) itemView.findViewById(R.id.tv_pord_name);
-                tvProdMount = (TextView) itemView.findViewById(R.id.tv_prod_mount);
-                tvPriceLine = (TextView) itemView.findViewById(R.id.tv_price_line);
-                etPricePur = (EditText) itemView.findViewById(R.id.et_price_pur);
-                etPricePur.setInputType(EditorInfo.TYPE_CLASS_PHONE);    //数字键盘
-//            etPricePur.setOnTouchListener(new CustomOnTouchListener(position, 1));
-//                etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR));
-                tvMountDing = (TextView) itemView.findViewById(R.id.tv_mount_ding);
-                etMountPur = (EditText) itemView.findViewById(R.id.et_mount_pur);
-                etMountPur.setInputType(EditorInfo.TYPE_CLASS_PHONE);
-//            etMountPur.setOnTouchListener(new CustomOnTouchListener(position, 2));
-//                etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR));
-                tvMoneyLine = (TextView) itemView.findViewById(R.id.tv_money_line);
-                tvMoneyPur = (TextView) itemView.findViewById(R.id.tv_money_pur);
-            }
-        }
-
         @Override
         public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(mContext).inflate(R.layout.layout_item, parent, false);
-            return new CustomViewHolder(view);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.layout_item, parent, false);
+            CustomViewHolder holder = new CustomViewHolder(view);
+            return holder;
         }
 
         @Override
         public void onBindViewHolder(CustomViewHolder viewHolder, int position) {
             PurchaseData data = mPurchaseList.get(position);
             int order = position + 1;
+            viewHolder.key = position;
             viewHolder.tvOrder.setText(String.valueOf(order));
             viewHolder.tvProdName.setText(data.getItemName());
             viewHolder.tvProdMount.setText(data.getUnit());
             viewHolder.tvPriceLine.setText(String.valueOf(data.getSellPrice() / 1000));
             viewHolder.etPricePur.setText(String.valueOf(data.getBuyPrice()));
-            viewHolder.etPricePur.addTextChangedListener(new CustomTextWatcher(viewHolder.etPricePur, position, PRICE_PUR));
+//            viewHolder.etPricePur.addTextChangedListener(new CustomTextWatcher(viewHolder.etPricePur, PRICE_PUR, viewHolder));
             viewHolder.tvMountDing.setText(String.valueOf(data.getNeedNumbre()));
 
             float moneyLine = data.getSellPrice() / 1000 * data.getNeedNumbre();
             viewHolder.tvMoneyLine.setText(String.valueOf(moneyLine));
 
             viewHolder.etMountPur.setText(String.valueOf(data.getMountPur()));
-//            viewHolder.etMountPur.addTextChangedListener(new CustomTextWatcher(viewHolder.etMountPur, position, MOUNT_PUR));
+//            viewHolder.etMountPur.addTextChangedListener(new CustomTextWatcher(viewHolder.etMountPur, MOUNT_PUR, viewHolder));
 
             float mountPur = Float.valueOf(viewHolder.etMountPur.getText().toString());
             float moneyPur = data.getBuyPrice() * mountPur;
@@ -645,6 +619,38 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
         @Override
         public int getItemCount() {
             return mPurchaseList.size();
+        }
+
+        //CustomViewHolder，用于缓存，提高效率
+        public class CustomViewHolder extends RecyclerView.ViewHolder {
+            private TextView tvOrder;                  //序号
+            private TextView tvProdName, tvProdMount;   //商品名称 & 规格
+            private TextView tvPriceLine;       //线上价格
+            private EditText etPricePur;        //采购价格
+            private TextView tvMountDing;       //订购量
+            private EditText etMountPur;        //采购量
+            private TextView tvMoneyLine, tvMoneyPur;   //线上金额 & 采购金额
+
+            private int key;    //给holder添加标签
+
+            public CustomViewHolder(View itemView) {
+                super(itemView);
+                tvOrder = (TextView) itemView.findViewById(R.id.tv_orde);
+                tvProdName = (TextView) itemView.findViewById(R.id.tv_pord_name);
+                tvProdMount = (TextView) itemView.findViewById(R.id.tv_prod_mount);
+                tvPriceLine = (TextView) itemView.findViewById(R.id.tv_price_line);
+                etPricePur = (EditText) itemView.findViewById(R.id.et_price_pur);
+                etPricePur.setInputType(EditorInfo.TYPE_CLASS_PHONE);    //数字键盘
+//            etPricePur.setOnTouchListener(new CustomOnTouchListener(position, 1));
+//                etPricePur.addTextChangedListener(new CustomTextWatcher(etPricePur, PRICE_PUR,CustomViewHolder.this));
+                tvMountDing = (TextView) itemView.findViewById(R.id.tv_mount_ding);
+                etMountPur = (EditText) itemView.findViewById(R.id.et_mount_pur);
+                etMountPur.setInputType(EditorInfo.TYPE_CLASS_PHONE);
+//            etMountPur.setOnTouchListener(new CustomOnTouchListener(position, 2));
+//                etMountPur.addTextChangedListener(new CustomTextWatcher(etMountPur, MOUNT_PUR, CustomViewHolder.this));
+                tvMoneyLine = (TextView) itemView.findViewById(R.id.tv_money_line);
+                tvMoneyPur = (TextView) itemView.findViewById(R.id.tv_money_pur);
+            }
         }
     }
 

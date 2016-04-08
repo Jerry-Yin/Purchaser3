@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 
 import me.jiudeng.purchase.R;
+import me.jiudeng.purchase.module.Keys;
 import me.jiudeng.purchase.module.PurchaseData;
 import me.jiudeng.purchase.utils.CharacterParser;
 import me.jiudeng.purchase.utils.FileUtil;
@@ -57,14 +59,14 @@ import me.jiudeng.purchase.view.SideBar;
  * Created by Yin on 2016/3/29.
  * ListView 版本
  */
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static String TAG = "MainActivity";
     private static final int REFRESH_DATA = 0;
     private static final int SEND_SUCCESS = 1;
     private static final int SEND_FAIL = 2;
-    private static final int PRICE_PUR = 0;
-    private static final int MOUNT_PUR = 1;
+    private static final int PRICE_PUR = 3;
+    private static final int MOUNT_PUR = 4;
 
     /**
      * Views
@@ -82,6 +84,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private List<PurchaseData> mPurchaseList = new ArrayList<>();
     private CharacterParser mCharacterParser; //汉字转换成拼音的类
     private PinyinComparator mPinyinComparator; //根据拼音来排列ListView里面的数据类
+    private List<Integer> mKey = new ArrayList<>();
+    private List<Keys> mKeys = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,10 +126,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         String fileContent = FileUtil.readFile(MainActivity.this);
         final Message message = new Message();
         Log.d(TAG, "初始化数据...");
-        if (!TextUtils.isEmpty(fileContent)) {
+        if (!(TextUtils.isEmpty(fileContent)) && !(fileContent == "[]")) {
             try {
                 paraseJsonData(fileContent.toString());
-                Log.d(TAG, "成功读取本地文件数据，加载...");
+                Log.d(TAG, "成功读取本地文件数据，fileContent = " + fileContent);
                 message.what = REFRESH_DATA;
                 mHandler.sendMessage(message);
                 mListAdapter.notifyDataSetChanged();
@@ -183,16 +187,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case REFRESH_DATA:
-                    Log.d(TAG, "排序前的 mPurchaseList = " + mPurchaseList.toString());
+//                    Log.d(TAG, "刷新界面---排序前的 mPurchaseList = " + mPurchaseList.toString());
                     mCharacterParser = CharacterParser.getInstance();
                     mPinyinComparator = new PinyinComparator();
                     // 根据a-z进行排序源数据
                     Collections.sort(mPurchaseList, mPinyinComparator);
-                    Log.d(TAG, "排序后的 mPurchaseList = " + mPurchaseList.toString());
-//                    mListAdapter = new PurchaseListAdapter(MainActivity.this, mPurchaseList);
+//                    Log.d(TAG, "刷新界面---排序后的 mPurchaseList = " + mPurchaseList.toString());
+//                    mListAdapter = new PurchaseListAdapter(MainActivity.this,  );
+
 //                    mListView.setAdapter(mListAdapter);
                     mListAdapter.notifyDataSetChanged();
-
                     saveDataToFile();//请求成功后将数据保存到本地
 //                    new TimeTaskUtil(MainActivity.this).startTimeTask();   //开启定时上传功能
                     break;
@@ -219,7 +223,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btn_logout:
                 // TODO: 2016/3/30  退出当前账号，弹出弹框；需要删除本地保存的用户信息，并退出到登录界面
-//                showDialogOld();
                 showDialogIos();
                 break;
 
@@ -310,8 +313,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         builder.show();
     }
 
-    int mCurTouchIndex = -1;
-    int mCurTouchIndex2 = -1;
+    int mCurTouchIndex = -2;
+    int mCurTouchIndex2 = -2;
 
     class PurchaseListAdapter extends BaseAdapter implements SectionIndexer {
 
@@ -328,8 +331,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             private TextView tvMountDing;       //订购量
             private EditText etMountPur;        //采购量
             private TextView tvMoneyLine, tvMoneyPur;   //线上金额 & 采购金额
-
-            private int key;
+            private int key;    //改进 方法，添加次标签，通过标签来操作；
+            private boolean isSetColor = false;
         }
 
         public PurchaseListAdapter(Context c, List<PurchaseData> mPurchaseList) {
@@ -363,50 +366,47 @@ public class MainActivity extends Activity implements View.OnClickListener {
             ViewHolder holder = null;
             if (convertView == null) {
                 holder = new ViewHolder();
-                Log.d(TAG, "posi = "+position);
                 convertView = inflater.inflate(R.layout.layout_item, null);
                 holder.tvOrder = (TextView) convertView.findViewById(R.id.tv_orde);
                 holder.tvProdName = (TextView) convertView.findViewById(R.id.tv_pord_name);
                 holder.tvProdMount = (TextView) convertView.findViewById(R.id.tv_prod_mount);
                 holder.tvPriceLine = (TextView) convertView.findViewById(R.id.tv_price_line);
                 holder.etPricePur = (EditText) convertView.findViewById(R.id.et_price_pur);
-//                holder.etPricePur.setInputType(EditorInfo.TYPE_CLASS_NUMBER);    //数字键盘
-                holder.etPricePur.setOnTouchListener(new CustomOnTouchListener(position, holder.etPricePur, 1));
-                holder.etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR, holder));
+//                holder.etPricePur.setOnTouchListener(new CustomOnTouchListener(position, holder.etPricePur, 1));    //捕获焦点
+                holder.etPricePur.addTextChangedListener(new CustomTextWatcher(holder.etPricePur, position, PRICE_PUR, holder));    //添加文字修改监听器
+//                holder.etPricePur.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
                 holder.tvMountDing = (TextView) convertView.findViewById(R.id.tv_mount_ding);
                 holder.etMountPur = (EditText) convertView.findViewById(R.id.et_mount_pur);
-//                holder.etMountPur.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
-                holder.etMountPur.setOnTouchListener(new CustomOnTouchListener(position, holder.etMountPur, 2));
+//                holder.etMountPur.setOnTouchListener(new CustomOnTouchListener(position, holder.etMountPur, 2));
                 holder.etMountPur.addTextChangedListener(new CustomTextWatcher(holder.etMountPur, position, MOUNT_PUR, holder));
                 holder.tvMoneyLine = (TextView) convertView.findViewById(R.id.tv_money_line);
                 holder.tvMoneyPur = (TextView) convertView.findViewById(R.id.tv_money_pur);
                 convertView.setTag(holder);
-            }
-              else {
+            } else {
                 holder = (ViewHolder) convertView.getTag();
-
             }
+//            if (String.valueOf(mPurchaseList.get(position).getBuyPrice()).equals(holder.etPricePur.getText())
+//                    && String.valueOf(mPurchaseList.get(position).getMountPur()).equals(holder.etMountPur.getText())) {
+//                convertView.setBackgroundColor(getResources().getColor(R.color.colorNormal));
+//            }
 
             // TODO 从数据list中取出数据并对应的设置
             int order = position + 1;
             holder.key = position;
-//            holder.etMountPur.setTag(position);
-
             PurchaseData purchaseData = mPurchaseList.get(position);
             holder.tvOrder.setText(String.valueOf(order));
             holder.tvProdName.setText(purchaseData.getItemName());
             holder.tvProdMount.setText(purchaseData.getUnit());
             holder.tvPriceLine.setText(String.valueOf(purchaseData.getSellPrice() / 1000));
-
-            Log.d(TAG, "i =" + position + " data = " + purchaseData.getBuyPrice());
-            if (!(String.valueOf(purchaseData.getBuyPrice()) == null)){
+//            Log.d(TAG, "i =" + position + " data = " + purchaseData.getBuyPrice());
+            if (!(String.valueOf(purchaseData.getBuyPrice()) == null)) {
                 holder.etPricePur.setText(String.valueOf(purchaseData.getBuyPrice()));
-            }else {
+            } else {
                 holder.etPricePur.setText("0");
             }
 
             holder.tvMountDing.setText(String.valueOf(purchaseData.getNeedNumbre()));
-            float moneyLine = purchaseData.getSellPrice() / 1000 *purchaseData.getNeedNumbre();
+            float moneyLine = purchaseData.getSellPrice() / 1000 * purchaseData.getNeedNumbre();
             holder.tvMoneyLine.setText(String.valueOf(moneyLine));
             holder.etMountPur.setText(String.valueOf(purchaseData.getMountPur()));
 
@@ -416,23 +416,55 @@ public class MainActivity extends Activity implements View.OnClickListener {
             holder.tvMoneyPur.setText(String.valueOf(moneyPur));
             purchaseData.setMoneyPur(moneyPur);
 
-            holder.etPricePur.clearFocus();
-            holder.etMountPur.clearFocus();
-            if (mCurTouchIndex == position) {
-                // 如果当前的行下标和点击事件中保存的index一致，手动为EditText设置焦点。
-                holder.etPricePur.requestFocus();
-                holder.etPricePur.setText("");
-//                holder.etPricePur.setSelection(holder.etPricePur.getText().length());
-                mCurTouchIndex = -1;
+            //两种颜色
+            if (!mKey.contains(holder.key)){
+                convertView.setBackgroundColor(getResources().getColor(R.color.colorNormal));
             }
-            if (mCurTouchIndex2 == position){
-                holder.etMountPur.requestFocus();
-                holder.etMountPur.setText("");
-//                holder.etMountPur.setSelection(holder.etMountPur.getText().length());
-                mCurTouchIndex2 = -1;
+            else {
+                convertView.setBackgroundColor(getResources().getColor(R.color.colorSelect1));
             }
-//            holder.etPricePur.setSelection( holder.etPricePur .getText().length());
 
+            //三种颜色：
+//            for (Keys k:mKeys){
+//                if (k.getHolderKey() == holder.key){
+//                    if (k.getTwoKey() == 1){
+//                        convertView.setBackgroundColor(getResources().getColor(R.color.colorSelect1));
+//                    }else if (k.getTwoKey() ==2){
+//                        convertView.setBackgroundColor(getResources().getColor(R.color.colorSelect2));
+//                    }else if (k.getTwoKey() ==3){
+////                        convertView.setBackgroundColor(getResources().getColor(R.color.colorSelect1));
+//                    }
+//                }else {
+//                    convertView.setBackgroundColor(getResources().getColor(R.color.colorNormal));
+//                }
+//            }
+
+//            if (mKey.size()>0 && !isInList(holder.key, mKey)){
+//                Log.d(TAG, "[key] = "+ mKey.toString()+"\n"+"key = "+holder.key);
+//                convertView.setBackgroundColor(getResources().getColor(R.color.colorNormal));
+//            }
+
+//            if (holder.isSetColor == false) {
+//                convertView.setBackgroundColor(getResources().getColor(R.color.colorNormal));
+//            }
+
+//            holder.etPricePur.clearFocus();
+//            holder.etMountPur.clearFocus();
+//            Log.d(TAG, "mCurTouchIndex = " + mCurTouchIndex);
+//            Log.d(TAG, "mCurTouchIndex2 = " + mCurTouchIndex2 + "\n");
+//            if (mCurTouchIndex == position) {
+//                // 如果当前的行下标和点击事件中保存的index一致，手动为EditText设置焦点。
+//                holder.etPricePur.requestFocus();
+//                holder.etPricePur.setText("");
+////                holder.etPricePur.setSelection(holder.etPricePur.getText().length());
+//                mCurTouchIndex = -2;
+//            }
+//            if (mCurTouchIndex2 == position) {
+//                holder.etMountPur.requestFocus();
+//                holder.etMountPur.setText("");
+////                holder.etMountPur.setSelection(holder.etMountPur.getText().length());
+//                mCurTouchIndex2 = -2;
+//            }
             return convertView;
         }
 
@@ -443,6 +475,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         /**
          * 根据首字母的ascii值来获取在该ListView中第一次出现该首字母的位置
+         *
          * @param sectionIndex
          * @return
          */
@@ -461,6 +494,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         /**
          * 根据ListView的position来获取该位置上面的name的首字母char的ascii值
+         *
          * @param position
          * @return
          */
@@ -474,56 +508,98 @@ public class MainActivity extends Activity implements View.OnClickListener {
     class CustomTextWatcher implements TextWatcher {
 
         private EditText mEt;
-//        private int mPosition;
         private int flag;
         private PurchaseListAdapter.ViewHolder viewHolder;
+        private String textBefore;
 
 
         public CustomTextWatcher(EditText e, int p, int flag, PurchaseListAdapter.ViewHolder holder) {
             this.mEt = e;
-//            this.mPosition = p;
             this.flag = flag;
             this.viewHolder = holder;
         }
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            this.textBefore = s.toString();
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-
         }
 
         /**
          * 改变之后， 把修改后的数据保存到本地数据
          * 修改一次，保存一次
+         *
          * @param s
          */
         @Override
         public void afterTextChanged(Editable s) {
-
+            if (TextUtils.isEmpty(s)) {
+                return;
+            }
+            if (s.toString().equals(textBefore)) {
+                return;
+            } else {
+                Log.d(TAG, " txtBefore = " + textBefore);
+                Log.d(TAG, " S = " + s);
+                Log.d(TAG, " boolean = " + s.toString().equals(textBefore));
+                String pricePur = String.valueOf(mPurchaseList.get(viewHolder.key).getBuyPrice());
+                String montPur = String.valueOf(mPurchaseList.get(viewHolder.key).getMountPur());
+                View view = (View) mEt.getParent().getParent();
                 if (flag == PRICE_PUR) {
-                    Log.d(TAG, "flag2 =" + flag);
-                    if (!TextUtils.isEmpty(s)) {
-                        Log.d(TAG, "i =" + viewHolder.key + " s = " + s.toString());
+                    Log.d(TAG, " flag1 = " + flag);
+                    Log.d(TAG, " key = " + viewHolder.key);
+                    if (!pricePur.equals(s.toString())) {
                         mPurchaseList.get(viewHolder.key).setBuyPrice(Float.valueOf(s.toString()));
+                        mKey.add(viewHolder.key);
+
+                        Keys k = new Keys();
+                        k.setHolderKey(viewHolder.key);
+                        k.setTwoKey(1);
+                        mKeys.add(k);
+
+                        ((View) view.getParent()).setBackgroundColor(getResources().getColor(R.color.colorSelect1));
+                        viewHolder.isSetColor = true;
+                        saveDataToFile();
+//                        flag = -1;
                     }
                 }
                 if (flag == MOUNT_PUR) {
-                    if (!TextUtils.isEmpty(s)) {
+                    Log.d(TAG, " flag2 = " + flag);
+                    if (!montPur.equals(s.toString())) {
+                        Log.d(TAG, " holder.key = " + viewHolder.key);
                         mPurchaseList.get(viewHolder.key).setMountPur(Float.valueOf(s.toString()));
+                        view.setBackgroundColor(getResources().getColor(R.color.colorSelect1));
+//                        view.setBackgroundColor(getResources().getColor(R.color.colorSelect2));
+                        viewHolder.isSetColor = true;
+                        mKey.add(viewHolder.key);
+
+                        Keys k = new Keys();
+                        k.setHolderKey(viewHolder.key);
+                        k.setTwoKey(2);
+                        mKeys.add(k);
+
+                        saveDataToFile();
+//                        flag = -1;
                     }
                 }
-//            mListAdapter.notifyDataSetChanged();
-                float sumMoney = 0;
-                for (PurchaseData data : mPurchaseList){
-                    sumMoney += data.getMoneyPur();
-                }
-                mTvPaySum.setText(String.valueOf(sumMoney));
-//            mListAdapter.notifyDataSetChanged();
-                saveDataToFile();
+//                if (!pricePur.equals(mEt.getText()) && !montPur.equals(mEt.getText())) {
+//                    if (view != null) {
+////                        view.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+//                    }
+//                }
+
+            }
+            float money = mPurchaseList.get(viewHolder.key).getBuyPrice() * mPurchaseList.get(viewHolder.key).getMountPur();
+            viewHolder.tvMoneyPur.setText(String.valueOf(money));
+
+            float sumMoney = 0;
+            for (PurchaseData data : mPurchaseList) {
+                sumMoney += data.getMoneyPur();
+            }
+            mTvPaySum.setText(String.valueOf(sumMoney));
 
         }
     }
@@ -533,36 +609,39 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //            Log.d(TAG, "存储的 mPurchaseList = " + mPurchaseList.toString());
             String jsonObject = new Gson().toJson(mPurchaseList);
 //            String data = mPurchaseList.toString();
-//            Log.d(TAG, "存储的 mPurchaseList 转化后 = " + jsonObject.toString());
+            Log.d(TAG, "存储的 mPurchaseList 转化后 = " + jsonObject.toString());
             new SaveFileUtil(MainActivity.this, jsonObject).saveDataToFile();
         }
     }
 
-    class CustomOnTouchListener implements View.OnTouchListener {
-
-        private int position;
-        private EditText text;
-        private int flag;
-
-        public CustomOnTouchListener(int position, EditText text, int flag) {
-            this.position = position;
-            this.text = text;
-            this.flag = flag;
-        }
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_UP){
-                if (flag == 1){
-                    mCurTouchIndex = position;
-                }if (flag == 2){
-                    mCurTouchIndex2 = position;
-                }
-                text.setText("");
-            }
-            return false;
-        }
-    }
+//    class CustomOnTouchListener implements View.OnTouchListener {
+//
+//        private int position;
+//        private EditText text;
+//        private int flag;
+//
+//        public CustomOnTouchListener(int position, EditText text, int flag) {
+//            this.position = position;
+//            this.text = text;
+//            this.flag = flag;
+//        }
+//
+//        @Override
+//        public boolean onTouch(View v, MotionEvent event) {
+//            if (event.getAction() == MotionEvent.ACTION_UP) {
+//                if (flag == 1) {
+//                    mCurTouchIndex = position;
+//                    text.requestFocus();
+//                }
+//                if (flag == 2) {
+//                    mCurTouchIndex2 = position;
+//                    text.requestFocus();
+//                }
+//                text.setText("");
+//            }
+//            return false;
+//        }
+//    }
 
     public void addTestData() {
         // 设置数据（测试数据）
@@ -590,6 +669,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //        Log.d(TAG, "排序后的 mPurchaseList = " + mPurchaseList.toString());
 //        mListAdapter = new PurchaseListAdapter(MainActivity.this, mPurchaseList);
 //        mListView.setAdapter(mListAdapter);
+    }
+
+    public boolean isInList(int a, List<Integer> list){
+        for (int tmp:list){
+            if (tmp == a){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

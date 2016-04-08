@@ -25,10 +25,10 @@ public class PurchaseData {
      PurchaseTime time.Time //采购员采购单生成时间
 
      /** 提交的数据格式(4个)
-     PurchaseTheory int       //采购单id                       <--->PurchasedId</--->
-     Price          int       //单价(单位厘 1/1000元) X1000    <--->自己填的</--->
-     Number         float64   //采购数量                       <--->自己填的</--->
-     Operator       string    //采购员
+     PurchaseTheory int       //采购单id                       <--->PurchasedId</--->   Id
+     Price          int       //单价(单位厘 1/1000元) X1000    <--->自己填的</--->      Price
+     Number         float64   //采购数量                       <--->自己填的</--->      Number
+     Operator       string    //采购员                                                  Operator
 
      CreateTime     time.Time //创建时间
      */
