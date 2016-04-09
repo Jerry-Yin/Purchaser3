@@ -195,13 +195,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     break;
 
                 case SEND_SUCCESS:
-
-                    Toast.makeText(MainActivity.this, "上传完毕！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "上传完毕！", Toast.LENGTH_LONG).show();
+                    mBtnSend.setTextColor(getResources().getColor(R.color.colorNormal));
+                    mBtnSend.setFocusable(true);
                     break;
 
                 case SEND_FAIL:
-
-                    Toast.makeText(MainActivity.this, "上传失败，请重新上传！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "上传失败，请重新上传！", Toast.LENGTH_LONG).show();
+                    mBtnSend.setTextColor(getResources().getColor(R.color.colorNormal));
+                    mBtnSend.setFocusable(true);
                     break;
 
                 default:
@@ -222,6 +224,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.btn_send:
                 // TODO: 2016/3/30 上传数据
                 postCurDataToServer();
+                mBtnSend.setFocusable(false);
+                mBtnSend.setTextColor(getResources().getColor(R.color.colorAccent));
                 break;
             default:
                 break;
@@ -402,7 +406,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
 
 //            holder.tvMountDing.setText(String.valueOf(purchaseData.getNeedNumbre()));
-            holder.tvMountDing.setText(String.valueOf(FormatNumberUtil.formatFloatNumber2(purchaseData.getNeedNumbre())));
+            holder.tvMountDing.setText(String.valueOf(FormatNumberUtil.formatFloatNumber(purchaseData.getNeedNumbre())));
             float moneyLine = purchaseData.getSellPrice() / 1000 * purchaseData.getNeedNumbre();
             holder.tvMoneyLine.setText(String.valueOf(moneyLine));
             holder.etMountPur.setText(String.valueOf(purchaseData.getMountPur()));
@@ -410,7 +414,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             float mountPur = Float.valueOf(holder.etMountPur.getText().toString());
             float moneyPur = purchaseData.getBuyPrice() * mountPur;
 
-            holder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber2(moneyPur));
+            holder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber(moneyPur));
             purchaseData.setMoneyPur(moneyPur);
 
             if (!holder.etPricePur.getText().toString().equals("0.0") && !holder.etMountPur.getText().toString().equals("0.0")){
@@ -429,10 +433,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 sumMoney += data.getMoneyPur();
                 sumLine += data.getSellPrice() * data.getNeedNumbre();
             }
-            mTvPaySum.setText("采购金额合计： ￥" + FormatNumberUtil.formatFloatNumber2(sumMoney));
+            mTvPaySum.setText("采购金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumMoney));
 //            mTvLineSum.setText("线上金额合计： ￥"+sumLine);
 //            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
-            mTvLineSum.setText("线上金额合计： ￥" + FormatNumberUtil.formatFloatNumber2(sumLine));
+            mTvLineSum.setText("线上金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumLine));
             return convertView;
         }
 
@@ -548,7 +552,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
             }
             float money = mPurchaseList.get(viewHolder.key).getBuyPrice() * mPurchaseList.get(viewHolder.key).getMountPur();
-            viewHolder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber2(money));
+            viewHolder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber(money));
 
 //            float sumMoney = 0;
 //            float sumLine = 0;
@@ -559,10 +563,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //            mTvPaySum.setText(String.valueOf(sumMoney));
 ////            mTvLineSum.setText("线上金额合计： ￥"+sumLine);
 ////            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
-//            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber2(sumLine));
+//            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
 //            Log.d(TAG, "sumline1 =" + sumLine);
 //            Log.d(TAG, "sumline2 ="+FormatNumberUtil.formatFloatNumber(sumLine));
-//            Log.d(TAG, "sumline3 ="+FormatNumberUtil.formatFloatNumber2(sumLine));
+//            Log.d(TAG, "sumline3 ="+FormatNumberUtil.formatFloatNumber(sumLine));
         }
 
     }
