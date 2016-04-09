@@ -26,6 +26,7 @@ public class FileUtil {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String date = format.format(new Date(System.currentTimeMillis()));
         String fileName = "table" + date + ".txt";
+//        String fileName = "table2016-0.-08.txt";
 
         FileInputStream fileInputStream = null;
         BufferedReader reader = null;

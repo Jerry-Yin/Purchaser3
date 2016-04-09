@@ -3,6 +3,7 @@ package me.jiudeng.purchase.network;
 import android.util.Log;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -29,6 +30,7 @@ public class HttpUtil {
 
     /**
      * 请求数据
+     *
      * @param address
      * @param usr
      * @param listener
@@ -64,7 +66,7 @@ public class HttpUtil {
                     }
                     if (listener != null) {
                         listener.onResponse(response.toString());
-                        Log.d(TAG, "数据请求 response = " +response.toString());
+                        Log.d(TAG, "数据请求 response = " + response.toString());
                     }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -90,6 +92,7 @@ public class HttpUtil {
 
     /**
      * 请求用户登录
+     *
      * @param address
      * @param uer
      * @param pwd
@@ -163,11 +166,12 @@ public class HttpUtil {
 
     /**
      * 上传数据
+     *
      * @param address
      * @param data
      * @param listener
      */
-    public static void postDataToServer(final String address, final String data, final OnResponseListener listener){
+    public static void postDataToServer(final String address, final String data, final OnResponseListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -199,9 +203,10 @@ public class HttpUtil {
                         }
 
                         if (listener != null) {
+                            Log.d(TAG, "response = "+response);
                             listener.onResponse(response.toString());
-                            Log.d(TAG, "response = " + response.toString());
                         }
+
                         reader.close();
                         inputStream.close();
                         outputStream.close();
