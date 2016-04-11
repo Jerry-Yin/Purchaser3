@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -55,6 +56,7 @@ import me.jiudeng.purchase.view.SideBar;
  */
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
+    private static final int REFRESH_SUM = 5;
     private static String TAG = "MainActivity";
     private static final int REFRESH_DATA = 0;
     private static final int SEND_SUCCESS = 1;
@@ -78,6 +80,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private List<PurchaseData> mPurchaseList = new ArrayList<>();
     private CharacterParser mCharacterParser; //汉字转换成拼音的类
     private PinyinComparator mPinyinComparator; //根据拼音来排列ListView里面的数据类
+    private Message message = new Message();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,46 +120,53 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void initData() {
         // TODO: 2016/4/5 先判断本地数据是否存在，存在则加载本地数据，否则请求网络数据
         String fileContent = FileUtil.readFile(MainActivity.this);
-        final Message message = new Message();
         Log.d(TAG, "初始化数据...");
-        if (!(TextUtils.isEmpty(fileContent)) && !(fileContent == null)) {
-            try {
-                paraseJsonData(fileContent.toString());
-                Log.d(TAG, "成功读取本地文件数据，fileContent = " + fileContent);
-                message.what = REFRESH_DATA;
-                mHandler.sendMessage(message);
-                mListAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        if (!(TextUtils.isEmpty(fileContent)) && !(fileContent == null) && !(fileContent.equals("[]"))) {
+            loadLocalData(fileContent);
         } else {
-            // TODO 网络请求，刷新界面; ---> 数据加载完毕后，调用定时任务定时上传，并且在关闭时结束任务
-            HttpUtil.SendHttpRequest(HttpUtil.addressGetData, "Operator=" + getAccount(), new OnResponseListener() {
-                @Override
-                public void onResponse(String response) {
-                    JSONObject object = null;
-                    try {
-                        object = new JSONObject(response);
-
-                        if (object.getInt("Code") == 0) {
-                            paraseJsonData(object.getString("Data"));     //解析数据，添加到list中
-                            Log.d(TAG, "response = " + response.toString());
-//                    addTestData();
-                            message.what = REFRESH_DATA;
-                            message.obj = response;
-                            mHandler.sendMessage(message);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(Exception error) {
-
-                }
-            });
+            requestDataFromService();
         }
+    }
+
+    private void loadLocalData(String fileContent) {
+        try {
+            paraseJsonData(fileContent.toString());
+            Log.d(TAG, "成功读取本地文件数据，fileContent = " + fileContent);
+            message.what = REFRESH_DATA;
+            mHandler.sendMessage(message);
+            mListAdapter.notifyDataSetChanged();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void requestDataFromService() {
+        // TODO 网络请求，刷新界面; ---> 数据加载完毕后，调用定时任务定时上传，并且在关闭时结束任务
+        HttpUtil.SendHttpRequest(HttpUtil.addressGetData, "Operator=" + getAccount(), new OnResponseListener() {
+            @Override
+            public void onResponse(String response) {
+                JSONObject object = null;
+                try {
+                    object = new JSONObject(response);
+
+                    if (object.getInt("Code") == 0) {
+                        paraseJsonData(object.getString("Data"));     //解析数据，添加到list中
+                        Log.d(TAG, "response = " + response.toString());
+//                    addTestData();
+                        message.what = REFRESH_DATA;
+                        message.obj = response;
+                        mHandler.sendMessage(message);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Exception error) {
+
+            }
+        });
     }
 
     private String getAccount() {
@@ -191,7 +201,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                    mListView.setAdapter(mListAdapter);
                     mListAdapter.notifyDataSetChanged();
                     saveDataToFile();//请求成功后将数据保存到本地
-//                    new TimeTaskUtil(MainActivity.this).startTimeTask();   //开启定时上传功能
+                    new TimeTaskUtil(MainActivity.this).startTimeTask();   //开启定时上传功能
                     break;
 
                 case SEND_SUCCESS:
@@ -206,12 +216,37 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     mBtnSend.setFocusable(true);
                     break;
 
+                case REFRESH_SUM:
+                    setSumData();
+                    break;
+
                 default:
                     break;
             }
             super.handleMessage(msg);
         }
     };
+
+    public void setSumData() {
+        float sumMoney = 0;
+        float sumLine = 0;
+        if (mPurchaseList.size() != 0) {
+            for (PurchaseData data : mPurchaseList) {
+                sumMoney += data.getMoneyPur();
+                sumLine += data.getSellPrice() / 1000 * data.getNeedNumbre();
+            }
+            mTvPaySum.setText("采购金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumMoney));
+//            mTvLineSum.setText("线上金额合计： ￥"+sumLine);
+//            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
+            mTvLineSum.setText("线上金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumLine));
+            ////            mTvLineSum.setText("线上金额合计： ￥"+sumLine);
+////            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
+//            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
+//            Log.d(TAG, "sumline1 =" + sumLine);
+//            Log.d(TAG, "sumline2 ="+FormatNumberUtil.formatFloatNumber(sumLine));
+//            Log.d(TAG, "sumline3 ="+FormatNumberUtil.formatFloatNumber(sumLine));
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -400,7 +435,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             holder.tvPriceLine.setText(String.valueOf(purchaseData.getSellPrice() / 1000));
 //            Log.d(TAG, "i =" + position + " data = " + purchaseData.getBuyPrice());
             if (!(String.valueOf(purchaseData.getBuyPrice()) == null)) {
-                holder.etPricePur.setText(String.valueOf(purchaseData.getBuyPrice()));
+                holder.etPricePur.setText(String.valueOf(purchaseData.getBuyPrice()/1000));
             } else {
                 holder.etPricePur.setText("0");
             }
@@ -412,31 +447,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             holder.etMountPur.setText(String.valueOf(purchaseData.getMountPur()));
 
             float mountPur = Float.valueOf(holder.etMountPur.getText().toString());
-            float moneyPur = purchaseData.getBuyPrice() * mountPur;
+            float moneyPur = purchaseData.getBuyPrice()/1000 * mountPur;
 
             holder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber(moneyPur));
             purchaseData.setMoneyPur(moneyPur);
 
-            if (!holder.etPricePur.getText().toString().equals("0.0") && !holder.etMountPur.getText().toString().equals("0.0")){
+            if (!holder.etPricePur.getText().toString().equals("0.0") && !holder.etMountPur.getText().toString().equals("0.0")) {
                 convertView.setBackgroundColor(getResources().getColor(R.color.colorSelectAll));
-            }else if (!holder.etPricePur.getText().toString().equals("0.0")){
+            } else if (!holder.etPricePur.getText().toString().equals("0.0")) {
                 convertView.setBackgroundColor(getResources().getColor(R.color.colorSelect1));
-            }else if (!holder.etMountPur.getText().toString().equals("0.0")){
+            } else if (!holder.etMountPur.getText().toString().equals("0.0")) {
                 convertView.setBackgroundColor(getResources().getColor(R.color.colorSelect2));
-            }else {
+            } else {
                 convertView.setBackgroundColor(getResources().getColor(R.color.colorNormal));
             }
-
-            float sumMoney = 0;
-            float sumLine = 0;
-            for (PurchaseData data : mPurchaseList) {
-                sumMoney += data.getMoneyPur();
-                sumLine += data.getSellPrice() * data.getNeedNumbre();
-            }
-            mTvPaySum.setText("采购金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumMoney));
-//            mTvLineSum.setText("线上金额合计： ￥"+sumLine);
-//            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
-            mTvLineSum.setText("线上金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumLine));
+            setSumData();
             return convertView;
         }
 
@@ -483,7 +508,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         private int flag;
         private PurchaseListAdapter.ViewHolder viewHolder;
         private String textBefore;
-
+        private Message message = new Message();
 
         public CustomTextWatcher(EditText e, int p, int flag, PurchaseListAdapter.ViewHolder holder) {
             this.mEt = e;
@@ -496,8 +521,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         if (mEt.getText().length() == 0) {
                             mEt.setText("0.0");
                         }
-                    }else {
-                        if (mEt.getText().toString().equals("0.0")){
+                    } else {
+                        if (mEt.getText().toString().equals("0.0")) {
                             mEt.setText("");
                         }
                     }
@@ -538,7 +563,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     Log.d(TAG, " flag1 = " + flag);
                     Log.d(TAG, " key = " + viewHolder.key);
                     if (!pricePur.equals(s.toString()) && !s.toString().equals(".")) {
-                        mPurchaseList.get(viewHolder.key).setBuyPrice(Float.valueOf(s.toString()));
+                        mPurchaseList.get(viewHolder.key).setBuyPrice(Float.valueOf(s.toString())*1000);
+                        ((View) mEt.getParent().getParent().getParent()).setBackgroundColor(getResources().getColor(R.color.colorSelect1));
+//                        message.what = REFRESH_SUM;
+//                        mHandler.sendMessage(message);
+                        setSumData();
                         saveDataToFile();
                     }
                 }
@@ -547,29 +576,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if (!montPur.equals(s.toString()) && !s.toString().equals(".")) {
                         Log.d(TAG, " holder.key = " + viewHolder.key);
                         mPurchaseList.get(viewHolder.key).setMountPur(Float.valueOf(s.toString()));
+                        ((View) mEt.getParent().getParent()).setBackgroundColor(getResources().getColor(R.color.colorSelect2));
+//                        message.what = REFRESH_SUM;
+//                        mHandler.sendMessage(message);
+                        setSumData();
                         saveDataToFile();
                     }
                 }
             }
-            float money = mPurchaseList.get(viewHolder.key).getBuyPrice() * mPurchaseList.get(viewHolder.key).getMountPur();
+            float money = mPurchaseList.get(viewHolder.key).getBuyPrice()/1000 * mPurchaseList.get(viewHolder.key).getMountPur();
             viewHolder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber(money));
 
-//            float sumMoney = 0;
-//            float sumLine = 0;
-//            for (PurchaseData data : mPurchaseList) {
-//                sumMoney += data.getMoneyPur();
-//                sumLine += data.getSellPrice()*data.getNeedNumbre();
-//            }
-//            mTvPaySum.setText(String.valueOf(sumMoney));
-////            mTvLineSum.setText("线上金额合计： ￥"+sumLine);
-////            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
-//            mTvLineSum.setText("线上金额合计： ￥"+FormatNumberUtil.formatFloatNumber(sumLine));
-//            Log.d(TAG, "sumline1 =" + sumLine);
-//            Log.d(TAG, "sumline2 ="+FormatNumberUtil.formatFloatNumber(sumLine));
-//            Log.d(TAG, "sumline3 ="+FormatNumberUtil.formatFloatNumber(sumLine));
+            setSumData();
         }
-
     }
+
 
     public void saveDataToFile() {
         if (mPurchaseList != null) {

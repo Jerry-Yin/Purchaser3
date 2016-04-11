@@ -53,11 +53,12 @@ public class PushDataUtil {
                 int PurchasedId = object.getInt("InfoId");
 
                 double Price = (double) object.get("BuyPrice");
-                float Price1 = (float) Price*1000;
+//                float Price1 = (float) Price*1000;
+                float Price1 = (float) Price;
 //                float Price = (float) object.get("BuyPrice");
 
-                double Number = (double) object.get("NeedNumber");
-//                float Number = (float) object.getDouble("NeedNumber");
+                double Number = (double) object.get("MountPur");
+//                float Number = (float) object.getDouble("MountPur");
                 float Number1 = (float) Number;
 
                 String Operator = (String) object.get("Operator");

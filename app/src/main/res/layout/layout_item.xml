@@ -31,17 +31,20 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:paddingTop="5dp"
+            android:layout_marginTop="5dp"
             android:text="@string/itemName"
-            android:textSize="13sp" />
+            android:gravity="center"
+            android:textSize="13sp"
+            android:ellipsize="middle"
+            android:maxLines="4"/>
 
         <TextView
             android:id="@+id/tv_prod_mount"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:paddingBottom="10dp"
+            android:paddingBottom="5dp"
             android:text="000g"
             android:textSize="13sp" />
     </LinearLayout>
@@ -100,7 +103,8 @@
                 android:text="0.0"
                 android:textSize="13sp"
                 android:paddingLeft="5dp"
-                android:inputType="number|numberDecimal"/>
+                android:inputType="number|numberDecimal"
+                android:maxLines="2"/>
             <!--android:numeric="decimal|integer"-->
         </LinearLayout>
     </FrameLayout>
@@ -180,7 +184,8 @@
                 android:layout_weight="1"
                 android:layout_marginTop="5dp"
                 android:text="000"
-                android:textSize="13sp"/>
+                android:textSize="13sp"
+                android:maxLines="2"/>
 
             <TextView
                 android:id="@+id/tv_money_pur"
@@ -191,7 +196,7 @@
                 android:layout_marginBottom="7dp"
                 android:text="000"
                 android:textSize="13sp"
-                />
+                android:maxLines="2"/>
         </LinearLayout>
 
     </LinearLayout>
