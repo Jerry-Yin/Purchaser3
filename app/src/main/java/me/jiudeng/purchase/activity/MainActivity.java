@@ -232,7 +232,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         float sumLine = 0;
         if (mPurchaseList.size() != 0) {
             for (PurchaseData data : mPurchaseList) {
-                sumMoney += data.getMoneyPur();
+//                sumMoney += data.getMoneyPur();
+                sumMoney += data.getBuyPrice()/1000 * data.getMountPur();
                 sumLine += data.getSellPrice() / 1000 * data.getNeedNumbre();
             }
             mTvPaySum.setText("采购金额合计： ￥" + FormatNumberUtil.formatFloatNumber(sumMoney));
@@ -567,7 +568,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         ((View) mEt.getParent().getParent().getParent()).setBackgroundColor(getResources().getColor(R.color.colorSelect1));
 //                        message.what = REFRESH_SUM;
 //                        mHandler.sendMessage(message);
-                        setSumData();
                         saveDataToFile();
                     }
                 }
@@ -579,15 +579,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         ((View) mEt.getParent().getParent()).setBackgroundColor(getResources().getColor(R.color.colorSelect2));
 //                        message.what = REFRESH_SUM;
 //                        mHandler.sendMessage(message);
-                        setSumData();
                         saveDataToFile();
                     }
                 }
             }
+            setSumData();
             float money = mPurchaseList.get(viewHolder.key).getBuyPrice()/1000 * mPurchaseList.get(viewHolder.key).getMountPur();
             viewHolder.tvMoneyPur.setText(FormatNumberUtil.formatFloatNumber(money));
-
-            setSumData();
         }
     }
 
